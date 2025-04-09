@@ -30,5 +30,8 @@ jobs:
     - name: Run Newman Collection with HTML Extra Report
       run: newman run ./petstore.collection.json -r htmlextra --reporter-htmlextra-export newman-report.html
     
+    - name: Rename HTML Report to Index
+      run: mv newman-report.html docs/index.html
+    
     - name: Copy HTML Report to Pages Folder
-      run: mkdir -p docs && cp newman-report.html docs/
+      run: mkdir -p docs && cp docs/index.html docs/
