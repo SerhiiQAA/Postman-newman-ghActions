@@ -10,20 +10,20 @@ GitHub Actions Workflow: Automated execution of Postman tests and generation of 
 GitHub Pages Deployment: The generated HTML report is published via GitHub Pages for easy access.
 
 ## How It Works
-Step 1: Start the Mock REST API Server
+### Step 1: Start the Mock REST API Server
 
 **Run the local API server:**
     ```bash
     npm run tern-on-api
 This command initializes the testing server on http://localhost:3000, serving endpoints for products, orders, and users.
 
-Step 2: Execute Postman Collection
+### Step 2: Execute Postman Collection
 
 **Run the Postman collection locally using Newman:**
     ```bash
     newman run petstore.collection.json -r htmlextra --reporter-htmlextra-export docs/index.html
 
-Step 3: Automate with GitHub Actions
+### Step 3: Automate with GitHub Actions
 
 The provided workflow file automates:
 
@@ -35,7 +35,7 @@ The provided workflow file automates:
 
     Deployment of the report to GitHub Pages.
 
-Step 4: View the Report
+### Step 4: View the Report
 
 **Access the published report via GitHub Pages at:**
     ```bash
