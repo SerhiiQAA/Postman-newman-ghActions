@@ -1,0 +1,3013 @@
+{
+	"info": {
+		"_postman_id": "6f8e57a5-bf6a-4b0a-aba4-b5f62e5b43a1",
+		"name": "storeNew2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24658772"
+	},
+	"item": [
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "GET product pagination",
+					"item": [
+						{
+							"name": "Get product pagination with valid data",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"API Response Validation (Page, PageSize)\", () => {",
+											"    let queryParams = pm.request.url.query;",
+											"    let pageParam = parseInt(queryParams.find(param => param.key === \"page\")?.value) || 1;",
+											"    let pageSizeParam = parseInt(queryParams.find(param => param.key === \"pageSize\")?.value) || 10;",
+											"    ",
+											"    let responseBody = pm.response.json();",
+											"",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    if (isNaN(pageParam)) {",
+											"        console.warn(\"Warning: Invalid 'page' value detected, API may default to a valid number.\");",
+											"    }",
+											"",
+											"    if (responseBody.length > 0) {",
+											"        pm.expect(responseBody.length).to.eql(pageSizeParam);",
+											"    } else {",
+											"        console.warn(\"Warning: API returned an empty array, check if this is expected.\");",
+											"    }",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products/?page=2&pageSize=3",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"products",
+										""
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "2"
+										},
+										{
+											"key": "pageSize",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get product pagination with invalid data: page",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {",
+											"    pm.response.to.have.status(400); ",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products/?page=sadf&pageSize=4",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"products",
+										""
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "sadf"
+										},
+										{
+											"key": "pageSize",
+											"value": "4"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get product pagination with invalid data: pageSize",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {",
+											"    pm.response.to.have.status(400); ",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products/?page=2&pageSize=wewe",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"products",
+										""
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "2"
+										},
+										{
+											"key": "pageSize",
+											"value": "wewe"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET product sorting",
+					"item": [
+						{
+							"name": "Get product sorting with valid data: sortOrder=ASC + sortKey=id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Verify sorting by id in ASC order\", () => {",
+											"    let responseBody = pm.response.json();",
+											"    ",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    let sortedArray = [...responseBody].sort((a, b) => a.id - b.id);",
+											"",
+											"    pm.expect(responseBody).to.eql(sortedArray);",
+											"});",
+											"",
+											"pm.test(\"Validate response schema\", () => {",
+											"    let responseBody = pm.response.json();",
+											"",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    responseBody.forEach(item => {",
+											"        pm.expect(item).to.be.an(\"object\");",
+											"        pm.expect(item).to.have.property(\"id\").that.is.a(\"number\");",
+											"        pm.expect(item).to.have.property(\"name\").that.is.a(\"string\");",
+											"        pm.expect(item).to.have.property(\"price\").that.is.a(\"number\");",
+											"        pm.expect(item).to.have.property(\"sku\").that.is.a(\"number\");",
+											"        pm.expect(item).to.have.property(\"description\").that.is.a(\"string\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products/?sortOrder=ASC&sortKey=id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"products",
+										""
+									],
+									"query": [
+										{
+											"key": "sortOrder",
+											"value": "ASC"
+										},
+										{
+											"key": "sortKey",
+											"value": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get product sorting with valid data: sortOrder=DESC + sortKey=id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Verify sorting by id in DESC order\", () => {",
+											"    let responseBody = pm.response.json();",
+											"    ",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    let sortedArray = [...responseBody].sort((a, b) => b.id - a.id);",
+											"",
+											"    pm.expect(responseBody).to.eql(sortedArray);",
+											"});",
+											"",
+											"pm.test(\"Validate response schema\", () => {",
+											"    let responseBody = pm.response.json();",
+											"",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    responseBody.forEach(item => {",
+											"        pm.expect(item).to.be.an(\"object\");",
+											"        pm.expect(item).to.have.property(\"id\").that.is.a(\"number\");",
+											"        pm.expect(item).to.have.property(\"name\").that.is.a(\"string\");",
+											"        pm.expect(item).to.have.property(\"price\").that.is.a(\"number\");",
+											"        pm.expect(item).to.have.property(\"sku\").that.is.a(\"number\");",
+											"        pm.expect(item).to.have.property(\"description\").that.is.a(\"string\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products/?sortOrder=DESC&sortKey=id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"products",
+										""
+									],
+									"query": [
+										{
+											"key": "sortOrder",
+											"value": "DESC"
+										},
+										{
+											"key": "sortKey",
+											"value": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get product sorting with sortOrder=DESC + invalid sortKey",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products/?sortOrder=DESC&sortKey=xxx",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"products",
+										""
+									],
+									"query": [
+										{
+											"key": "sortOrder",
+											"value": "DESC"
+										},
+										{
+											"key": "sortKey",
+											"value": "xxx"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get product sorting with only sortKey=id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Verify sorting by id in ASC order\", () => {",
+											"    let responseBody = pm.response.json();",
+											"    ",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    let sortedArray = [...responseBody].sort((a, b) => a.id - b.id);",
+											"",
+											"    pm.expect(responseBody).to.eql(sortedArray);",
+											"});",
+											"",
+											"pm.test(\"Validate response schema\", () => {",
+											"    let responseBody = pm.response.json();",
+											"",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    responseBody.forEach(item => {",
+											"        pm.expect(item).to.be.an(\"object\");",
+											"        pm.expect(item).to.have.property(\"id\").that.is.a(\"number\");",
+											"        pm.expect(item).to.have.property(\"name\").that.is.a(\"string\");",
+											"        pm.expect(item).to.have.property(\"price\").that.is.a(\"number\");",
+											"        pm.expect(item).to.have.property(\"sku\").that.is.a(\"number\");",
+											"        pm.expect(item).to.have.property(\"description\").that.is.a(\"string\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products/?sortKey=id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"products",
+										""
+									],
+									"query": [
+										{
+											"key": "sortKey",
+											"value": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "List products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Validate GET list products response schema\", () => {\r",
+									"    let responseBody = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseBody).to.be.an(\"array\");\r",
+									"\r",
+									"    responseBody.forEach(item => {\r",
+									"        pm.expect(item).to.be.an(\"object\");\r",
+									"        pm.expect(item).to.have.property(\"id\").that.is.a(\"number\");\r",
+									"        pm.expect(item).to.have.property(\"name\").that.is.a(\"string\");\r",
+									"        pm.expect(item).to.have.property(\"price\").that.is.a(\"number\");\r",
+									"        pm.expect(item).to.have.property(\"sku\").that.is.a(\"number\");\r",
+									"        pm.expect(item).to.have.property(\"description\").that.is.a(\"string\");\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.expect(pm.response.json()).to.be.an(\"array\"); \r",
+									"console.log(\"Total entities:\", pm.response.json().length);\r",
+									"\r",
+									"pm.test(\"Response time is less than 200ms\", () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.collectionVariables.set(\"productID\", pm.response.json().id);",
+									"",
+									"pm.test(\"Validate schema of created product\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"price\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"description\").that.is.a(\"string\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"randomName\", `apple from Ukraine; code: ${Math.random().toString(36).substring(2, 7)}`);",
+									"pm.variables.set(\"randomPrice\", Math.floor(Math.random() * 1000) + 1);  ",
+									"pm.variables.set(\"randomSku\", Math.floor(Math.random() * 1000000000000)); ",
+									"pm.variables.set(\"randomDescription\", `Generated description ${Date.now()}`);  ",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{randomName}}\",\r\n    \"price\": {{randomPrice}},\r\n    \"sku\": {{randomSku}},\r\n    \"description\": \"{{randomDescription}}\"\r\n}\r\n\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get product by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Validate GET response schema by ID\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"price\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"description\").that.is.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/{{productID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"{{productID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get product by invalid ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/@@@@@@@@@@@@@@@@@@@@@@@@",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"@@@@@@@@@@@@@@@@@@@@@@@@"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Check new data\", () => {",
+									"    let responseBody = pm.response.json();",
+									"    pm.expect(responseBody.name).to.eql(\"Updated Name\"); ",
+									"    pm.expect(responseBody.price).to.eql(1999.99);",
+									"    pm.expect(responseBody.sku).to.eql(123321123);",
+									"    pm.expect(responseBody.description).to.eql(\"Updated product description\"); // ",
+									"});",
+									"",
+									"pm.test(\"Validate PUT response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"price\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"description\").that.is.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": {{productID}},\r\n    \"name\": \"Updated Name\",\r\n    \"price\": 1999.99,\r\n    \"sku\": 123321123,\r\n    \"description\": \"Updated product description\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update only product name by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Validate updated user data consistency\", () => {",
+									"    let responseBody = pm.response.json();",
+									"    let requestBody = JSON.parse(pm.request.body.raw);",
+									"",
+									"    pm.expect(responseBody.id).to.eql(requestBody.id);",
+									"    pm.expect(responseBody.name).to.eql(requestBody.name);",
+									"});",
+									"",
+									"pm.test(\"Validate PUT response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"price\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"description\").that.is.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": {{productID}},\r\n    \"name\": \"Updated Name\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update product without ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Updated Name\",\r\n    \"price\": 1999.99,\r\n    \"sku\": 123321123,\r\n    \"description\": \"Updated product description\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get updated product by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Перевірка статусу відповіді\", () => {",
+									"    pm.response.to.have.status(200); // Очікуємо статус успішного запиту",
+									"});",
+									"",
+									"pm.test(\"Validate GET search response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"price\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"description\").that.is.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/{{productID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"{{productID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove product by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус: успішно видалено\", () => {",
+									"    pm.response.to.have.status(200); // ",
+									"});",
+									"",
+									"pm.test(\"Validate DELETE response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"price\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"description\").that.is.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/4",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Removing of the deleted product again by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"The product no longer exists to be removed\", () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/{{productID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"{{productID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get product by ID after removing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/{{productID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"{{productID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "GET order pagination",
+					"item": [
+						{
+							"name": "GET order pagination with valid data",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"API Response Validation (Page, PageSize)\", () => {",
+											"    let queryParams = pm.request.url.query;",
+											"    let pageParam = parseInt(queryParams.find(param => param.key === \"page\")?.value) || 1;",
+											"    let pageSizeParam = parseInt(queryParams.find(param => param.key === \"pageSize\")?.value) || 10;",
+											"    ",
+											"    let responseBody = pm.response.json();",
+											"",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    if (isNaN(pageParam)) {",
+											"        console.warn(\"Warning: Invalid 'page' value detected, API may default to a valid number.\");",
+											"    }",
+											"",
+											"    if (responseBody.length > 0) {",
+											"        pm.expect(responseBody.length).to.eql(pageSizeParam);",
+											"    } else {",
+											"        console.warn(\"Warning: API returned an empty array, check if this is expected.\");",
+											"    }",
+											"});",
+											"",
+											"pm.test(\"Validate GET list orders response schema\", () => {",
+											"    let responseBody = pm.response.json();",
+											"",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    responseBody.forEach(item => {",
+											"        pm.expect(item).to.be.an(\"object\");",
+											"        pm.expect(item).to.have.property(\"id\").that.is.a(\"number\");",
+											"        pm.expect(item).to.have.property(\"name\").that.is.a(\"string\");",
+											"        pm.expect(item).to.have.property(\"sku\").that.is.a(\"number\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/orders/?page=2&pageSize=3",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"orders",
+										""
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "2"
+										},
+										{
+											"key": "pageSize",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET order pagination with invalid page",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {",
+											"    pm.response.to.have.status(400); ",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/orders?page=sadfdfsa&pageSize=5",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"orders"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "sadfdfsa"
+										},
+										{
+											"key": "pageSize",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET order pagination with invalid pageSize",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {",
+											"    pm.response.to.have.status(400); ",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/orders?page=1&pageSize=sdfds",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"orders"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "pageSize",
+											"value": "sdfds"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET order sorting",
+					"item": [
+						{
+							"name": "Get orders sorting with valid data: sortOrder=ASC + sortKey=id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Verify sorting by id in ASC order\", () => {",
+											"    let responseBody = pm.response.json();",
+											"    ",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    let sortedArray = [...responseBody].sort((a, b) => a.id - b.id);",
+											"",
+											"    pm.expect(responseBody).to.eql(sortedArray);",
+											"});",
+											"",
+											"pm.test(\"Validate GET list orders response schema\", () => {",
+											"    let responseBody = pm.response.json();",
+											"",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    responseBody.forEach(item => {",
+											"        pm.expect(item).to.be.an(\"object\");",
+											"        pm.expect(item).to.have.property(\"id\").that.is.a(\"number\");",
+											"        pm.expect(item).to.have.property(\"name\").that.is.a(\"string\");",
+											"        pm.expect(item).to.have.property(\"sku\").that.is.a(\"number\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/orders/?sortOrder=ASC&sortKey=id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"orders",
+										""
+									],
+									"query": [
+										{
+											"key": "sortOrder",
+											"value": "ASC"
+										},
+										{
+											"key": "sortKey",
+											"value": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get orders sorting with valid data: sortOrder=DESC + sortKey=id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Verify sorting by id in DESC order\", () => {",
+											"    let responseBody = pm.response.json();",
+											"    ",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    let sortedArray = [...responseBody].sort((a, b) => b.id - a.id);",
+											"",
+											"    pm.expect(responseBody).to.eql(sortedArray);",
+											"});",
+											"",
+											"pm.test(\"Validate GET list orders response schema\", () => {",
+											"    let responseBody = pm.response.json();",
+											"",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    responseBody.forEach(item => {",
+											"        pm.expect(item).to.be.an(\"object\");",
+											"        pm.expect(item).to.have.property(\"id\").that.is.a(\"number\");",
+											"        pm.expect(item).to.have.property(\"name\").that.is.a(\"string\");",
+											"        pm.expect(item).to.have.property(\"sku\").that.is.a(\"number\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/orders/?sortOrder=DESC&sortKey=id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"orders",
+										""
+									],
+									"query": [
+										{
+											"key": "sortOrder",
+											"value": "DESC"
+										},
+										{
+											"key": "sortKey",
+											"value": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get orders sorting with sortOrder=DESC + invalid sortKey",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/orders/?sortOrder=DESC&sortKey=xxx",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"orders",
+										""
+									],
+									"query": [
+										{
+											"key": "sortOrder",
+											"value": "DESC"
+										},
+										{
+											"key": "sortKey",
+											"value": "xxx"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get orders sorting with only sortKey=id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Verify sorting by id in ASC order\", () => {",
+											"    let responseBody = pm.response.json();",
+											"    ",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    let sortedArray = [...responseBody].sort((a, b) => a.id - b.id);",
+											"",
+											"    pm.expect(responseBody).to.eql(sortedArray);",
+											"});",
+											"",
+											"pm.test(\"Validate GET list orders response schema\", () => {",
+											"    let responseBody = pm.response.json();",
+											"",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    responseBody.forEach(item => {",
+											"        pm.expect(item).to.be.an(\"object\");",
+											"        pm.expect(item).to.have.property(\"id\").that.is.a(\"number\");",
+											"        pm.expect(item).to.have.property(\"name\").that.is.a(\"string\");",
+											"        pm.expect(item).to.have.property(\"sku\").that.is.a(\"number\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/orders/?sortKey=id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"orders",
+										""
+									],
+									"query": [
+										{
+											"key": "sortKey",
+											"value": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "List orders",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Validate GET list orders response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"array\");",
+									"",
+									"    responseBody.forEach(item => {",
+									"        pm.expect(item).to.be.an(\"object\");",
+									"        pm.expect(item).to.have.property(\"id\").that.is.a(\"number\");",
+									"        pm.expect(item).to.have.property(\"name\").that.is.a(\"string\");",
+									"        pm.expect(item).to.have.property(\"sku\").that.is.a(\"number\");",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.collectionVariables.set(\"orderID\", pm.response.json().id);",
+									"",
+									"pm.test(\"Validate POST response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"randomName\", `order from Ukraine; code: ${Math.random().toString(36).substring(2, 7)}`); ",
+									"pm.variables.set(\"randomSku\", Math.floor(Math.random() * 1000000000000000)); ",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{randomName}}\",\r\n    \"sku\": {{randomSku}}\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get order by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Validate GET response schema by ID\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/orders/{{orderID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"{{orderID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get order by invalid ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/orders/!@#$%^",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"!@"
+							],
+							"hash": "$%^"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Validate PUT response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+									"});",
+									"",
+									"pm.test(\"Validate updated data consistency\", () => {",
+									"    let responseBody = pm.response.json();",
+									"    let requestBody = JSON.parse(pm.request.body.raw);",
+									"",
+									"    pm.expect(responseBody.id).to.eql(requestBody.id);",
+									"    pm.expect(responseBody.name).to.eql(requestBody.name);",
+									"    pm.expect(responseBody.sku).to.eql(requestBody.sku);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": {{orderID}},\r\n    \"name\": \"Updated Name\",\r\n    \"sku\": 7777777777777777777777777777777777\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update only order name by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Validate updated user data consistency\", () => {",
+									"    let responseBody = pm.response.json();",
+									"    let requestBody = JSON.parse(pm.request.body.raw);",
+									"",
+									"    pm.expect(responseBody.id).to.eql(requestBody.id);",
+									"    pm.expect(responseBody.name).to.eql(requestBody.name);",
+									"});",
+									"",
+									"pm.test(\"Validate PUT response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": {{orderID}},\r\n    \"name\": \"Updated Name\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update order without ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Updated Name\",\r\n    \"sku\": 7777777777777777777777777777777777\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get updated order by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Validate GET response schema by ID\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/orders/{{orderID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"{{orderID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove order by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Validate DELETE response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/orders/{{orderID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"{{orderID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Removing of the deleted order again by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"The order no longer exists to be removed\", () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/orders/{{orderID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"{{orderID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get order by ID after removing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/orders/{{orderID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"{{orderID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "GET user pagination",
+					"item": [
+						{
+							"name": "GET user pagination with valid data",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Validate GET users list response schema\", () => {",
+											"    let responseBody = pm.response.json();",
+											"",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    responseBody.forEach(user => {",
+											"        pm.expect(user).to.be.an(\"object\");",
+											"        pm.expect(user).to.have.property(\"id\").that.is.a(\"number\");",
+											"        pm.expect(user).to.have.property(\"firstName\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"lastName\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"email\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"dateOfBirth\").that.is.a(\"string\"); // Дата у вигляді рядка",
+											"        pm.expect(user).to.have.property(\"emailVerified\").that.is.a(\"boolean\");",
+											"        pm.expect(user).to.have.property(\"signUpDate\").that.is.a(\"string\"); // Дата у вигляді рядка",
+											"        pm.expect(user).to.have.property(\"status\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"level\").that.is.a(\"string\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/users/?page=2&pageSize=3",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"users",
+										""
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "2"
+										},
+										{
+											"key": "pageSize",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET user pagination with invalid page",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {",
+											"    pm.response.to.have.status(400); ",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/users/?page=test&pageSize=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"users",
+										""
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "test"
+										},
+										{
+											"key": "pageSize",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET user pagination with invalid pageSize",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {",
+											"    pm.response.to.have.status(400); ",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/users/?page=1&pageSize=TEST",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"users",
+										""
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "pageSize",
+											"value": "TEST"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET user sorting",
+					"item": [
+						{
+							"name": "Get user sorting with valid data: sortOrder=ASC + sortKey=id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Verify sorting by id in ASC order\", () => {",
+											"    let responseBody = pm.response.json();",
+											"    ",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    let sortedArray = [...responseBody].sort((a, b) => a.id - b.id);",
+											"",
+											"    pm.expect(responseBody).to.eql(sortedArray);",
+											"});",
+											"",
+											"pm.test(\"Validate GET users list response schema\", () => {",
+											"    let responseBody = pm.response.json();",
+											"",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    responseBody.forEach(user => {",
+											"        pm.expect(user).to.be.an(\"object\");",
+											"        pm.expect(user).to.have.property(\"id\").that.is.a(\"number\");",
+											"        pm.expect(user).to.have.property(\"firstName\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"lastName\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"email\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"dateOfBirth\").that.is.a(\"string\"); // Дата у вигляді рядка",
+											"        pm.expect(user).to.have.property(\"emailVerified\").that.is.a(\"boolean\");",
+											"        pm.expect(user).to.have.property(\"signUpDate\").that.is.a(\"string\"); // Дата у вигляді рядка",
+											"        pm.expect(user).to.have.property(\"status\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"level\").that.is.a(\"string\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/users/?sortOrder=ASC&sortKey=id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"users",
+										""
+									],
+									"query": [
+										{
+											"key": "sortOrder",
+											"value": "ASC"
+										},
+										{
+											"key": "sortKey",
+											"value": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get user sorting with valid data: sortOrder=DESC + sortKey=id Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Verify sorting by id in DESC order\", () => {",
+											"    let responseBody = pm.response.json();",
+											"    ",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    let sortedArray = [...responseBody].sort((a, b) => b.id - a.id);",
+											"",
+											"    pm.expect(responseBody).to.eql(sortedArray);",
+											"});",
+											"",
+											"pm.test(\"Validate GET users list response schema\", () => {",
+											"    let responseBody = pm.response.json();",
+											"",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    responseBody.forEach(user => {",
+											"        pm.expect(user).to.be.an(\"object\");",
+											"        pm.expect(user).to.have.property(\"id\").that.is.a(\"number\");",
+											"        pm.expect(user).to.have.property(\"firstName\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"lastName\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"email\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"dateOfBirth\").that.is.a(\"string\"); // Дата у вигляді рядка",
+											"        pm.expect(user).to.have.property(\"emailVerified\").that.is.a(\"boolean\");",
+											"        pm.expect(user).to.have.property(\"signUpDate\").that.is.a(\"string\"); // Дата у вигляді рядка",
+											"        pm.expect(user).to.have.property(\"status\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"level\").that.is.a(\"string\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/users/?sortOrder=DESC&sortKey=id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"users",
+										""
+									],
+									"query": [
+										{
+											"key": "sortOrder",
+											"value": "DESC"
+										},
+										{
+											"key": "sortKey",
+											"value": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get user sorting with valid data: sortOrder=DESC + invalid sortKey",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/users/?sortOrder=DESC&sortKey=TESTTTTTTTTTTTTTTTTTTTTTTT",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"users",
+										""
+									],
+									"query": [
+										{
+											"key": "sortOrder",
+											"value": "DESC"
+										},
+										{
+											"key": "sortKey",
+											"value": "TESTTTTTTTTTTTTTTTTTTTTTTT"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get user sorting with only sortKey",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Verify sorting by id in ASC order\", () => {",
+											"    let responseBody = pm.response.json();",
+											"    ",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    let sortedArray = [...responseBody].sort((a, b) => a.id - b.id);",
+											"",
+											"    pm.expect(responseBody).to.eql(sortedArray);",
+											"});",
+											"",
+											"pm.test(\"Validate GET users list response schema\", () => {",
+											"    let responseBody = pm.response.json();",
+											"",
+											"    pm.expect(responseBody).to.be.an(\"array\");",
+											"",
+											"    responseBody.forEach(user => {",
+											"        pm.expect(user).to.be.an(\"object\");",
+											"        pm.expect(user).to.have.property(\"id\").that.is.a(\"number\");",
+											"        pm.expect(user).to.have.property(\"firstName\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"lastName\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"email\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"dateOfBirth\").that.is.a(\"string\"); // Дата у вигляді рядка",
+											"        pm.expect(user).to.have.property(\"emailVerified\").that.is.a(\"boolean\");",
+											"        pm.expect(user).to.have.property(\"signUpDate\").that.is.a(\"string\"); // Дата у вигляді рядка",
+											"        pm.expect(user).to.have.property(\"status\").that.is.a(\"string\");",
+											"        pm.expect(user).to.have.property(\"level\").that.is.a(\"string\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 200ms\", () => {",
+											"    pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/users/?sortKey=id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"users",
+										""
+									],
+									"query": [
+										{
+											"key": "sortKey",
+											"value": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "List users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Validate GET users list response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"array\");",
+									"",
+									"    responseBody.forEach(user => {",
+									"        pm.expect(user).to.be.an(\"object\");",
+									"        pm.expect(user).to.have.property(\"id\").that.is.a(\"number\");",
+									"        pm.expect(user).to.have.property(\"firstName\").that.is.a(\"string\");",
+									"        pm.expect(user).to.have.property(\"lastName\").that.is.a(\"string\");",
+									"        pm.expect(user).to.have.property(\"email\").that.is.a(\"string\");",
+									"        pm.expect(user).to.have.property(\"dateOfBirth\").that.is.a(\"string\"); // Дата у вигляді рядка",
+									"        pm.expect(user).to.have.property(\"emailVerified\").that.is.a(\"boolean\");",
+									"        pm.expect(user).to.have.property(\"signUpDate\").that.is.a(\"string\"); // Дата у вигляді рядка",
+									"        pm.expect(user).to.have.property(\"status\").that.is.a(\"string\");",
+									"        pm.expect(user).to.have.property(\"level\").that.is.a(\"string\");",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.collectionVariables.set(\"userID\", pm.response.json().id);",
+									"",
+									"pm.test(\"Validate POST response schema & save ID\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"firstName\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"lastName\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"email\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"dateOfBirth\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"emailVerified\").that.is.a(\"boolean\");",
+									"    pm.expect(responseBody).to.have.property(\"signUpDate\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"status\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"level\").that.is.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"randomFirstName\", `Ilon ${Math.random().toString(36).substring(2, 6)}`);",
+									"pm.variables.set(\"randomLastName\", `Mask ${Math.random().toString(36).substring(2, 6)}`);",
+									"pm.variables.set(\"randomEmail\", `tesla.real${Math.floor(Math.random() * 1000)}@gmail.com`);",
+									"pm.variables.set(\"randomDateOfBirth\", `${Math.floor(Math.random() * (2022 - 1980) + 1980)}-0${Math.floor(Math.random() * 9 + 1)}-${Math.floor(Math.random() * 28 + 1)}`);",
+									"pm.variables.set(\"randomEmailVerified\", Math.random() > 0.5 ? true : false); ",
+									"pm.variables.set(\"randomSignUpDate\", `${Math.floor(Math.random() * (2022 - 2000) + 2000)}-0${Math.floor(Math.random() * 9 + 1)}-${Math.floor(Math.random() * 28 + 1)}`);",
+									"pm.variables.set(\"randomStatus\", Math.random() > 0.5 ? \"active\" : \"inactive\"); ",
+									"pm.variables.set(\"randomLevel\", Math.random() > 0.5 ? \"junior\" : \"senior\"); ",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"{{randomFirstName}}\",\r\n    \"lastName\": \"{{randomLastName}}\",\r\n    \"email\": \"{{randomEmail}}\",\r\n    \"dateOfBirth\": \"{{randomDateOfBirth}}\",\r\n    \"emailVerified\": {{randomEmailVerified}},\r\n    \"signUpDate\": \"{{randomSignUpDate}}\",\r\n    \"status\": \"{{randomStatus}}\",\r\n    \"level\": \"{{randomLevel}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Validate GET response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"firstName\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"lastName\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"email\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"dateOfBirth\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"emailVerified\").that.is.a(\"boolean\");",
+									"    pm.expect(responseBody).to.have.property(\"signUpDate\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"status\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"level\").that.is.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user by invalid ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/1000000000000000000000000000",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"1000000000000000000000000000"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Validate updated user data consistency\", () => {",
+									"    let responseBody = pm.response.json();",
+									"    let requestBody = JSON.parse(pm.request.body.raw);",
+									"",
+									"    pm.expect(responseBody.id).to.eql(requestBody.id);",
+									"    pm.expect(responseBody.firstName).to.eql(requestBody.firstName);",
+									"    pm.expect(responseBody.lastName).to.eql(requestBody.lastName);",
+									"    pm.expect(responseBody.email).to.eql(requestBody.email);",
+									"    pm.expect(responseBody.dateOfBirth).to.eql(requestBody.dateOfBirth);",
+									"    pm.expect(responseBody.emailVerified).to.eql(requestBody.emailVerified);",
+									"    pm.expect(responseBody.signUpDate).to.eql(requestBody.signUpDate);",
+									"    pm.expect(responseBody.status).to.eql(requestBody.status);",
+									"    pm.expect(responseBody.level).to.eql(requestBody.level);",
+									"});",
+									"",
+									"pm.test(\"Validate PUT response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"firstName\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"lastName\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"email\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"dateOfBirth\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"emailVerified\").that.is.a(\"boolean\");",
+									"    pm.expect(responseBody).to.have.property(\"signUpDate\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"status\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"level\").that.is.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Termi\",\r\n    \"lastName\": \"Nator\",\r\n    \"email\": \"IllBe.back@gmail.com\",\r\n    \"dateOfBirth\": \"2001-10-99\",\r\n    \"emailVerified\": true,\r\n    \"signUpDate\": \"2027-08-24\",\r\n    \"status\": \"active\",\r\n    \"level\": \"lord\",\r\n    \"id\": {{userID}}\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update only user firstName by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Validate updated user data consistency\", () => {",
+									"    let responseBody = pm.response.json();",
+									"    let requestBody = JSON.parse(pm.request.body.raw);",
+									"",
+									"    pm.expect(responseBody.id).to.eql(requestBody.id);",
+									"    pm.expect(responseBody.firstName).to.eql(requestBody.firstName);",
+									"});",
+									"",
+									"pm.test(\"Validate PUT response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"firstName\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"lastName\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"email\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"dateOfBirth\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"emailVerified\").that.is.a(\"boolean\");",
+									"    pm.expect(responseBody).to.have.property(\"signUpDate\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"status\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"level\").that.is.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Termi\",\r\n    \"id\": {{userID}}\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update user without ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Termi\",\r\n    \"lastName\": \"Nator\",\r\n    \"email\": \"IllBe.back@gmail.com\",\r\n    \"dateOfBirth\": \"2001-10-99\",\r\n    \"emailVerified\": true,\r\n    \"signUpDate\": \"2027-08-24\",\r\n    \"status\": \"active\",\r\n    \"level\": \"lord\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get updated user by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Validate GET response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"firstName\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"lastName\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"email\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"dateOfBirth\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"emailVerified\").that.is.a(\"boolean\");",
+									"    pm.expect(responseBody).to.have.property(\"signUpDate\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"status\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"level\").that.is.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove user by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Validate PUT response schema\", () => {",
+									"    let responseBody = pm.response.json();",
+									"",
+									"    pm.expect(responseBody).to.be.an(\"object\");",
+									"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+									"    pm.expect(responseBody).to.have.property(\"firstName\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"lastName\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"email\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"dateOfBirth\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"emailVerified\").that.is.a(\"boolean\");",
+									"    pm.expect(responseBody).to.have.property(\"signUpDate\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"status\").that.is.a(\"string\");",
+									"    pm.expect(responseBody).to.have.property(\"level\").that.is.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Removing of the deleted user again by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"The order no longer exists to be removed\", () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user by ID after removing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "productID",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "orderID",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userID",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

@@ -1,0 +1,31 @@
+name: Run Newman Collection
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  run-newman:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+    
+    - name: Install Newman
+      run: npm install -g newman
+    
+    - name: Install Newman HTML Extra Reporter
+      run: npm install -g newman-reporter-htmlextra
+    
+    - name: Run Newman Collection with HTML Extra Report
+      run: newman run ./petstore.collection.json -r htmlextra --reporter-htmlextra-export newman-report.html
+    
+    - name: Copy HTML Report to Pages Folder
+      run: mkdir -p docs && cp newman-report.html docs/
