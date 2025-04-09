@@ -7,31 +7,44 @@ on:
   pull_request:
 
 jobs:
-  run-newman:
+  test-api:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    - name: Install Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-    
-    - name: Install Newman
-      run: npm install -g newman
-    
-    - name: Install Newman HTML Extra Reporter
-      run: npm install -g newman-reporter-htmlextra
-    
-    - name: Start Local API Server
-      run: npm run tern-on-api &
-    
-    - name: Run Newman Collection with HTML Extra Report
-      run: newman run ./petstore.collection.json -r htmlextra --reporter-htmlextra-export newman-report.html
-    
-    - name: Rename HTML Report to Index
-      run: mv newman-report.html docs/index.html
-    
-    - name: Copy HTML Report to Pages Folder
-      run: mkdir -p docs && cp docs/index.html docs/
+      # Step 1: Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Install Node.js
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
+      # Step 3: Install Newman and HTML Extra Reporter
+      - name: Install Newman and Reporter
+        run: |
+          npm install -g newman
+          npm install -g newman-reporter-htmlextra
+
+      # Step 4: Make Directory for Report Results
+      - name: Create Directory for Results
+        run: mkdir -p testResults
+
+      # Step 5: Start Local Server (if applicable)
+      - name: Start Local API Server
+        run: npm run tern-on-api &
+
+      # Step 6: Run Newman Collection and Generate Report
+      - name: Run Newman Collection
+        run: |
+          newman run ./petstore.collection.json \
+          -r htmlextra \
+          --reporter-htmlextra-export testResults/index.html \
+          --reporter-htmlextra-darkTheme
+
+      # Step 7: Upload Test Report as Artifact
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: TestReport
+          path: testResults
