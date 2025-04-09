@@ -31,6 +31,6 @@ This command initializes the testing server on http://localhost:3000, serving en
     htmlextra Reporter: For enhanced, visually appealing test reports.
 
 ## Future Improvements
-    Add integration with additional public APIs.
-    Extend test cases to cover edge scenarios.
-    Automate more advanced reporting and monitoring.
+Add integration with additional public APIs.
+Extend test cases to cover edge scenarios.
+Automate more advanced reporting and monitoring.
