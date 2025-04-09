@@ -12,7 +12,7 @@ GitHub Pages Deployment: The generated HTML report is published via GitHub Pages
 ## How It Works
 Step 1: Start the Mock REST API Server
 
-Run the local API server:
+**Run the local API server:**
     ```bash
     npm run tern-on-api
 This command initializes the testing server on http://localhost:3000, serving endpoints for products, orders, and users.
@@ -20,8 +20,8 @@ This command initializes the testing server on http://localhost:3000, serving en
 Step 2: Execute Postman Collection
 
 **Run the Postman collection locally using Newman:**
-```bash
-newman run petstore.collection.json -r htmlextra --reporter-htmlextra-export docs/index.html
+    ```bash
+    newman run petstore.collection.json -r htmlextra --reporter-htmlextra-export docs/index.html
 
 Step 3: Automate with GitHub Actions
 
@@ -38,8 +38,8 @@ The provided workflow file automates:
 Step 4: View the Report
 
 **Access the published report via GitHub Pages at:**
-```bash
-https://<your-username>.github.io/<your-repository>/
+    ```bash
+    https://<your-username>.github.io/<your-repository>/
 
 ## Technologies Used
 
