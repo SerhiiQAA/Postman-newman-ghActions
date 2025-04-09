@@ -1,44 +1,49 @@
 name: Test-Build
+
 on:
   push:
     branches:
       - main
+
 jobs:
   test-api:
     runs-on: ubuntu-latest
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Step 1: Checkout repository
       - uses: actions/checkout@v2
 
-
-      # INstall Node on the runner
+      # Step 2: Install Node
       - name: Install Node
         uses: actions/setup-node@v1
         with:
           node-version: "12.x"
 
-
-      # Install the newman command line utility and also install the html extra reporter
+      # Step 3: Install Newman and Reporter
       - name: Install newman
         run: |
           npm install -g newman
           npm install -g newman-reporter-htmlextra
 
-
-      # Make directory to upload the test results
+      # Step 4: Create Directory for Results
       - name: Make Directory for results
         run: mkdir -p testResults
 
-
-      # Run the POSTMAN collection
+      # Step 5: Run Postman Collection and Generate Report
       - name: Run POSTMAN collection
         run: |
-          newman run petstore.collection.json -r htmlextra --reporter-htmlextra-export testResults/htmlreport.html --reporter-htmlextra-darkTheme  > testResults/runreport1.html
+          newman run petstore.collection.json -r htmlextra \
+          --reporter-htmlextra-export testResults/htmlreport.html \
+          --reporter-htmlextra-darkTheme
 
+      # Step 6: Copy Report to Docs Folder for GitHub Pages
+      - name: Copy Report to Docs Folder
+        run: |
+          mkdir -p docs
+          cp testResults/htmlreport.html docs/index.html
 
-      # Upload the contents of Test Results directory to workspace
-      - name: Output the run Details
+      # Step 7: Upload Test Results as Artifact (Optional)
+      - name: Upload Test Results
         uses: actions/upload-artifact@v2
         with:
           name: RunReports
-          path: testResults 
+          path: testResults
