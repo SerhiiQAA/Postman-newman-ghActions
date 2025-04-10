@@ -10,7 +10,7 @@ This repository demonstrates the integration of Postman collections with GitHub 
 - GitHub Pages Deployment: The generated HTML report is published via GitHub Pages for easy access.
 
 ## Attantion
-There are two collections in the repository: petstore.collection.json and store.collection.json
+There are two collections in the repository: petstore.collection.json and store.collection.json.
 To run the store.collection.json collection, you need to run it using a local server.
 
 ## How It Works
