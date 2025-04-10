@@ -4,10 +4,10 @@ This repository demonstrates the integration of Postman collections with GitHub 
 
 ## Key Features
 
-Mock REST API Testing: Local server for testing products, orders, and users endpoints with support for GET, POST, PUT, and DELETE methods.
-Postman Integration Tests: Includes automated tests for status codes, pagination, sorting, response time, and JSON schema validation following the AAA approach (Arrange, Act, Assert).
-GitHub Actions Workflow: Automated execution of Postman tests and generation of a detailed HTML report.
-GitHub Pages Deployment: The generated HTML report is published via GitHub Pages for easy access.
+- Mock REST API Testing: Local server for testing products, orders, and users endpoints with support for GET, POST, PUT, and DELETE methods.
+- Postman Integration Tests: Includes automated tests for status codes, pagination, sorting, response time, and JSON schema validation following the AAA approach (Arrange, Act, Assert).
+- GitHub Actions Workflow: Automated execution of Postman tests and generation of a detailed HTML report.
+- GitHub Pages Deployment: The generated HTML report is published via GitHub Pages for easy access.
 
 ## Attantion
 There are two collections in the repository: petstore.collection.json and store.collection.json
