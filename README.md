@@ -37,7 +37,7 @@ This command initializes the testing server on http://localhost:3000, serving en
 - Postman & Newman: For API testing and report generation.
 - GitHub Actions: For CI/CD automation.
 - GitHub Pages: For report hosting.
-- Node.js: For dependency management and local server setup.
+- Node.js latest version 23.x+: For dependency management and local server setup.
 - htmlextra Reporter: For enhanced, visually appealing test reports.
 
 ## Future Improvements
