@@ -16,7 +16,7 @@ jobs:
       - name: Install Node
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: "23.x"
 
       # Step 3: Install Newman and Reporter
       - name: Install newman
