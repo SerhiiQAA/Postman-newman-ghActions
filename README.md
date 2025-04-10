@@ -19,16 +19,16 @@ To run the store.collection.json collection, you need to run it using a local se
     npm install -g newman
     ```
 This command installs Newman globally, enabling you to run Postman collections from the command line.
-1. **Run the local API server:**
+2. **Run the local API server:**
     ```bash
     npm run tern-on-api
 This command initializes the testing server on http://localhost:3000, serving endpoints for products, orders, and users (for store.collection.json).
 
-1. **Run the Postman collection locally using Newman:**
+3. **Run the Postman collection locally using Newman:**
     ```bash
     newman run petstore.collection.json -r htmlextra --reporter-htmlextra-export docs/index.html
 
-1. **Access the published report via GitHub Pages at:**
+4. **Access the published report via GitHub Pages at:**
     ```bash
     https://<your-username>.github.io/<your-repository>/
 
