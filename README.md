@@ -19,6 +19,7 @@ To run the store.collection.json collection, you need to run it using a local se
     npm install -g newman
     ```
 This command installs Newman globally, enabling you to run Postman collections from the command line.
+
 2. **Run the local API server:**
     ```bash
     npm run tern-on-api
