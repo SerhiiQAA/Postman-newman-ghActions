@@ -1,0 +1,288 @@
+{
+	"info": {
+		"_postman_id": "18a07110-628e-41cf-a39f-a52ada54de5c",
+		"name": "StoreNew3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24658772"
+	},
+	"item": [
+		{
+			"name": "Create product Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", () => {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.collectionVariables.set(\"productID\", pm.response.json().id);",
+							"console.log(\"New productID saved:\", pm.collectionVariables.get(\"productID\"));",
+							"",
+							"pm.test(\"Validate schema of created product\", () => {",
+							"    let responseBody = pm.response.json();",
+							"",
+							"    pm.expect(responseBody).to.be.an(\"object\");",
+							"    pm.expect(responseBody).to.have.property(\"id\").that.is.a(\"number\");",
+							"    pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+							"    pm.expect(responseBody).to.have.property(\"price\").that.is.a(\"number\");",
+							"    pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+							"    pm.expect(responseBody).to.have.property(\"description\").that.is.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 200ms\", () => {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});",
+							"",
+							"let baseUrl = pm.collectionVariables.get(\"baseUrl\");",
+							"console.log(\"baseUrl is:\", baseUrl);",
+							"",
+							"let productID = pm.collectionVariables.get(\"productID\");",
+							"",
+							"if (!baseUrl || !productID) {",
+							"    throw new Error(\"Collection variables 'baseUrl' or 'productID' are not defined!\");",
+							"}",
+							"",
+							"let deleteUrl = baseUrl + \"/products/\" + productID;",
+							"console.log(\"DELETE request to:\", deleteUrl);",
+							"",
+							"pm.sendRequest({",
+							"    url: deleteUrl,",
+							"    method: 'DELETE',",
+							"    header: {",
+							"        'Content-Type': 'application/json'",
+							"    }",
+							"}, (err, response) => {",
+							"    if (err) {",
+							"        console.error(\"Error in DELETE request:\", err);",
+							"        pm.test(\"DELETE request failed\", () => {",
+							"            throw new Error(\"Failed to execute DELETE request\");",
+							"        });",
+							"    } else {",
+							"        pm.test(\"Status code for DELETE is 201\", () => {",
+							"        pm.expect(pm.response.code).to.eql(201); ",
+							"        });",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (!pm.collectionVariables.get(\"baseUrl\")) {",
+							"    pm.collectionVariables.set(\"baseUrl\", \"http://localhost:3000\");",
+							"    console.log(\"Base URL was initialized:\", pm.collectionVariables.get(\"baseUrl\"));",
+							"}",
+							"",
+							"pm.variables.set(\"randomName\", `apple from Ukraine; code: ${Math.random().toString(36).substring(2, 7)}`);",
+							"pm.variables.set(\"randomPrice\", Math.floor(Math.random() * 1000) + 1);  ",
+							"pm.variables.set(\"randomSku\", Math.floor(Math.random() * 1000000000000)); ",
+							"pm.variables.set(\"randomDescription\", `Generated description ${Date.now()}`);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{randomName}}\",\r\n    \"price\": {{randomPrice}},\r\n    \"sku\": {{randomSku}},\r\n    \"description\": \"{{randomDescription}}\"\r\n}\r\n\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/products/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"products",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remove product by ID Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Validate DELETE response schema\", () => {",
+							"    if (pm.response.text()) { ",
+							"        let responseBody = pm.response.json();",
+							"        pm.expect(responseBody).to.be.an(\"object\");",
+							"        pm.expect(responseBody).to.have.property(\"id\").that.eql(pm.collectionVariables.get(\"deleteProductID\"));",
+							"        pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+							"        pm.expect(responseBody).to.have.property(\"price\").that.is.a(\"number\");",
+							"        pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+							"        pm.expect(responseBody).to.have.property(\"description\").that.is.a(\"string\");",
+							"    } else {",
+							"        console.log(\"Response body is empty, skipping schema validation\");",
+							"    }",
+							"});",
+							"",
+							"let baseUrl = pm.collectionVariables.get(\"baseUrl\");",
+							"let deleteProductID = pm.collectionVariables.get(\"deleteProductID\");",
+							"",
+							"if (!baseUrl || !deleteProductID) {",
+							"    throw new Error(\"Collection variables 'baseUrl' or 'deleteProductID' are not defined!\");",
+							"}",
+							"",
+							"let deleteUrl = baseUrl + \"/products/\" + deleteProductID;",
+							"console.log(\"DELETE request to:\", deleteUrl);",
+							"",
+							"pm.sendRequest({",
+							"    url: deleteUrl,",
+							"    method: 'DELETE',",
+							"    header: {",
+							"        'Content-Type': 'application/json'",
+							"    }",
+							"}, (err, response) => {",
+							"    if (err) {",
+							"        console.error(\"Error in DELETE request:\", err);",
+							"        pm.test(\"DELETE request failed\", () => {",
+							"            throw new Error(\"Failed to execute DELETE request\");",
+							"        });",
+							"    } else {",
+							"        pm.test(\"Status: successfully deleted\", () => {",
+							"            pm.response.to.have.status(200);",
+							"        });",
+							"",
+							"pm.test(\"Validate DELETE response schema\", () => {",
+							"    if (pm.response.text()) {",
+							"        let responseBody = pm.response.json();",
+							"        pm.expect(responseBody).to.be.an(\"object\");",
+							"        pm.expect(responseBody).to.have.property(\"id\").that.eql(pm.collectionVariables.get(\"deleteProductID\"));",
+							"        pm.expect(responseBody).to.have.property(\"name\").that.is.a(\"string\");",
+							"        pm.expect(responseBody).to.have.property(\"price\").that.is.a(\"number\");",
+							"        pm.expect(responseBody).to.have.property(\"sku\").that.is.a(\"number\");",
+							"        pm.expect(responseBody).to.have.property(\"description\").that.is.a(\"string\");",
+							"    } else {",
+							"        console.log(\"Response body is empty, skipping schema validation\");",
+							"    }",
+							"});",
+							"",
+							"        pm.test(\"Response time is less than 200ms\", () => {",
+							"            pm.expect(pm.response.responseTime).to.be.below(200);",
+							"        });",
+							"",
+							"        pm.collectionVariables.unset(\"deleteProductID\");",
+							"        console.log(\"deleteProductID unset after DELETE\");",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (!pm.collectionVariables.get(\"deleteProductID\")) {",
+							"    console.log(\"deleteProductID is not defined, creating a new product...\");",
+							"",
+							"    pm.sendRequest({",
+							"        url: pm.collectionVariables.get(\"baseUrl\") + \"/products/\",",
+							"        method: 'POST',",
+							"        header: {",
+							"            'Content-Type': 'application/json'",
+							"        },",
+							"        body: {",
+							"            mode: 'raw',",
+							"            raw: JSON.stringify({",
+							"                name: `Temp product for DELETE`,",
+							"                price: Math.floor(Math.random() * 1000) + 1,",
+							"                sku: Math.floor(Math.random() * 1000000000000),",
+							"                description: `Temporary product for testing`",
+							"            })",
+							"        }",
+							"    }, (err, response) => {",
+							"        if (err) {",
+							"            console.error(\"Error creating product:\", err);",
+							"            throw new Error(\"Failed to create product for DELETE request\");",
+							"        } else {",
+							"            let responseBody = response.json();",
+							"            console.log(\"Created product:\", responseBody);",
+							"",
+							"            pm.collectionVariables.set(\"deleteProductID\", responseBody.id);",
+							"            console.log(\"deleteProductID set:\", responseBody.id);",
+							"        }",
+							"    });",
+							"} else {",
+							"    console.log(\"Existing deleteProductID:\", pm.collectionVariables.get(\"deleteProductID\"));",
+							"}",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/products/{{deleteProductID}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"products",
+						"{{deleteProductID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "productID",
+			"value": "8"
+		}
+	]
+}
